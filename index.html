@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #F1F4FD;
+        }
+        .container {
+            max-width: 1200px;
+            width: 95%;
+        }
+        .slider-wrapper {
+            position: relative;
+        }
+        .image-list {
+            display: grid;
+            gap: 18px;
+            grid-template-columns: repeat(10, 1fr);
+            overflow-x: auto;
+            scrollbar-width: none;
+            margin-bottom: 30px;
+        }
+        .image-item {
+            width: 325px;
+            height: 400px;
+            object-fit: cover;
+        }
+        .image-list::-webkit-scrollbar {
+            display: none;
+        }
+        .slider-scrollbar {
+            height: 24px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .scrollbar-track {
+            height: 2px;
+            width: 100%;
+            background: #ccc;
+            position: relative;
+            border-radius: 4px;
+        }
+        .scrollbar-thumb {
+            position: absolute;
+            height: 100%;
+            width: 50%;
+            background: #000;
+            border-radius: inherit;
+            cursor: pointer;
+        }
+        .slide-button {
+            position: absolute;
+            top: 50%;
+            height: 50px;
+            width: 50px;
+            color: #fff;
+            border: none;
+            background-color: #000;
+            font-size: 2.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+        #prev-slide {
+            left: -20px;
+            display: none;
+        }
+        #next-slide {
+            right: -20px;
+        }
+        @media (max-width: 1023px) {
+            .slide-button {
+                display: none !important;
+            }
+            .image-list {
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            .image-item {
+                width: 280px;
+                height: 380px;
+            }
+            .scrollbar-thumb {
+                width: 20%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="slider-wrapper">
+            <button id="prev-slide" class="slide-button material-symbols-outlined">chevron_left</button>
+            <div class="image-list">
+                <img src="./images/imageone.jpg" alt="img-1" class="image-item">
+                <img src="./images/imagetwo.jpg" alt="img-2" class="image-item">
+                <img src="./images/imagethree.jpg" alt="img-3" class="image-item">
+                <img src="./images/imagefour.jpg" alt="img-4" class="image-item">
+                <img src="./images/imagefive.jpg" alt="img-5" class="image-item">
+                <img src="./images/imagesix.jpg" alt="img-6" class="image-item">
+                <img src="./images/imageseven.jpg" alt="img-7" class="image-item">
+                <img src="./images/imageeight.jpg" alt="img-8" class="image-item">
+                <img src="./images/imagenine.jpg" alt="img-9" class="image-item">
+                <img src="./images/imageten.jpg" alt="img-10" class="image-item">
+            </div>
+            <button id="next-slide" class="slide-button material-symbols-outlined">chevron_right</button>
+        </div>
+        <div class="slider-scrollbar">
+            <div class="scrollbar-track">
+                <div class="scrollbar-thumb"></div>
+            </div>
+        </div>  
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const imageList = document.querySelector('.image-list');
+            const prevSlideButton = document.getElementById('prev-slide');
+            const nextSlideButton = document.getElementById('next-slide');
+            const scrollbarThumb = document.querySelector('.scrollbar-thumb');
+            const maxScrollLeft = imageList.scrollWidth - imageList.clientWidth;
+
+            const updateButtonsAndThumb = () => {
+                prevSlideButton.style.display = imageList.scrollLeft > 0 ? 'block' : 'none';
+                nextSlideButton.style.display = imageList.scrollLeft < maxScrollLeft ? 'block' : 'none';
+
+                const scrollRatio = imageList.scrollLeft / maxScrollLeft;
+                scrollbarThumb.style.left = `${scrollRatio * (imageList.clientWidth - scrollbarThumb.offsetWidth)}px`;
+            };
+
+            prevSlideButton.addEventListener('click', () => {
+                imageList.scrollBy({ left: -imageList.clientWidth, behavior: 'smooth' });
+            });
+
+            nextSlideButton.addEventListener('click', () => {
+                imageList.scrollBy({ left: imageList.clientWidth, behavior: 'smooth' });
+            });
+
+            imageList.addEventListener('scroll', updateButtonsAndThumb);
+
+            scrollbarThumb.addEventListener('mousedown', (e) => {
+                const startX = e.clientX;
+                const startLeft = scrollbarThumb.offsetLeft;
+                const onMouseMove = (e) => {
+                    const deltaX = e.clientX - startX;
+                    const newLeft = Math.min(Math.max(startLeft + deltaX, 0), imageList.clientWidth - scrollbarThumb.offsetWidth);
+                    scrollbarThumb.style.left = `${newLeft}px`;
+                    imageList.scrollLeft = (newLeft / (imageList.clientWidth - scrollbarThumb.offsetWidth)) * maxScrollLeft;
+                };
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+
+            updateButtonsAndThumb();
+        });
+    </script>
+</body>
+</html>
